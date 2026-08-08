@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABTalks - 60-Day Coding Challenge</title>
+    <title>ABTalks - 60-Day Coding Challenge Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -14,16 +14,16 @@
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950 flex justify-center min-h-screen">
 
-    <!-- Mobile Frame Simulation Wrapper (Forces 390px Viewport as requested) -->
+    <!-- Mobile Frame Simulation Wrapper (390px Viewport) -->
     <div class="w-full max-w-[390px] bg-slate-950 min-h-screen flex flex-col justify-between border-x border-slate-900 shadow-2xl relative overflow-hidden">
 
         <!-- ROUTER CONTAINER -->
-        <div id="app-router" class="flex-grow flex flex-col pb-24">
+        <div id="app-router" class="flex-grow flex flex-col pb-24 overflow-y-auto hide-scrollbar">
             <!-- Dynamically injected views go here -->
         </div>
 
         <!-- MOBILE BOTTOM NAVIGATION BAR -->
-        <nav class="absolute bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800/80 px-6 py-3 flex justify-between items-center z-50">
+        <nav class="absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 px-4 py-3 flex justify-between items-center z-50">
             <button onclick="router.navigateTo('/')" id="nav-home" class="flex flex-col items-center gap-1 text-slate-400 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span class="text-[10px] font-medium">Home</span>
@@ -41,12 +41,15 @@
 
     <!-- JAVASCRIPT APP & ROUTER LOGIC -->
     <script>
-        // Mock State supporting edge cases (e.g. toggle first-day/missed-day states)
+        // Enhanced App State with new interactive features
         const appState = {
             streakState: 'active', // 'active', 'zero', 'missed'
-            dayCompleted: false,
-            githubLink: '',
-            linkedinLink: '',
+            selectedTrack: 'AI & Full Stack',
+            githubLink: 'https://github.com/ishaancodding-prog/ai-agent',
+            linkedinLink: 'https://linkedin.com/posts/ishaancodding_aicoding',
+            isSubmitted: false,
+            synergyPoints: 450,
+            activeTab: 'tasks', // For dashboard tabs: 'tasks', 'leaderboard', 'resources'
             toastMessage: null
         };
 
@@ -80,7 +83,7 @@
             render();
         });
 
-        // VIEWS
+        // 1. LANDING PAGE VIEW (/)
         function renderLanding() {
             return `
                 <div class="p-6 space-y-6 animate-fadeIn">
@@ -100,116 +103,122 @@
                             Build every day.<br>Get noticed by <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">top recruiters.</span>
                         </h1>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Designed specifically for Indian college students. Code post-college, build real apps, submit your GitHub commit & LinkedIn post, and build an unignorable public streak.
+                            Designed for Indian college students. Code post-college, submit your GitHub commit & LinkedIn post, and build an unignorable public streak.
                         </p>
                     </div>
 
+                    <!-- Track Selector Feature -->
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
+                        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wide">Select Your Learning Track</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setTrack('AI & Full Stack')" class="p-2.5 rounded-lg text-xs font-medium border text-left transition ${appState.selectedTrack === 'AI & Full Stack' ? 'bg-cyan-500/10 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-400'}">
+                                🤖 AI & Full Stack
+                            </button>
+                            <button onclick="setTrack('Cloud & DevOps')" class="p-2.5 rounded-lg text-xs font-medium border text-left transition ${appState.selectedTrack === 'Cloud & DevOps' ? 'bg-cyan-500/10 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-400'}">
+                                ☁️ Cloud & DevOps
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Social Proof Metric Cards -->
-                    <div class="grid grid-cols-2 gap-3 py-2">
+                    <div class="grid grid-cols-2 gap-3">
                         <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
                             <div class="text-xl font-extrabold text-white">25+</div>
                             <div class="text-xs text-slate-400 mt-0.5">Students Placed</div>
                         </div>
                         <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
-                            <div class="text-xl font-extrabold text-cyan-400">10,000+</div>
+                            <div class="text-xl font-extrabold text-cyan-400">10k+</div>
                             <div class="text-xs text-slate-400 mt-0.5">Active Learners</div>
                         </div>
                     </div>
 
-                    <!-- Thoughtful Feature: Late-Night Dorm Mode Indicator -->
+                    <!-- Late-Night Hostel Friendly Badge -->
                     <div class="bg-gradient-to-r from-indigo-950/40 to-slate-900 border border-indigo-500/30 p-4 rounded-xl flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 text-lg">🌙</div>
                         <div>
-                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wide">Late-Night Hostel Friendly</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Optimized for mobile & low-bandwidth dorm Wi-Fi. Submit proof in under 2 minutes.</p>
+                            <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-wide">Late-Night Hostel Mode</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Optimized for mobile & low-bandwidth dorm Wi-Fi. Quick 2-minute verification.</p>
                         </div>
                     </div>
 
                     <!-- Action CTA -->
-                    <div class="pt-4 space-y-3">
+                    <div class="pt-2 space-y-3">
                         <button onclick="router.navigateTo('/dashboard')" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
-                            <span>Start Your 60-Day Journey</span>
+                            <span>Start 60-Day Journey (${appState.selectedTrack})</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                         </button>
-                        <p class="text-center text-[11px] text-slate-500">No credit card required. Free for all college students.</p>
                     </div>
                 </div>
             `;
         }
 
+        // 2. STUDENT DASHBOARD VIEW (/dashboard)
         function renderDashboard() {
-            // Determine streak badge & view based on appState
-            let streakDisplay = '';
+            let streakBanner = '';
             if (appState.streakState === 'zero') {
-                streakDisplay = `<div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center gap-3 mb-6">
-                    <span class="text-2xl">🌱</span>
+                streakBanner = `<div class="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl flex items-center gap-3">
+                    <span class="text-xl">🌱</span>
                     <div>
                         <h4 class="text-xs font-bold text-amber-400 uppercase">Day 1 - Fresh Start</h4>
-                        <p class="text-xs text-slate-300 mt-0.5">Your journey begins today. Complete your first commit to ignite your streak!</p>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Complete today's task to start building your public streak!</p>
                     </div>
                 </div>`;
             } else if (appState.streakState === 'missed') {
-                streakDisplay = `<div class="bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-center gap-3 mb-6">
-                    <span class="text-2xl">⚠️</span>
+                streakBanner = `<div class="bg-red-500/10 border border-red-500/30 p-3.5 rounded-xl flex items-center gap-3">
+                    <span class="text-xl">⚠️</span>
                     <div>
                         <h4 class="text-xs font-bold text-red-400 uppercase">Streak Frozen</h4>
-                        <p class="text-xs text-slate-300 mt-0.5">You missed yesterday's submission. Submit Day 12 today to instantly revive your streak!</p>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Missed yesterday. Submit Day 12 to revive instantly!</p>
                     </div>
                 </div>`;
             }
 
             return `
                 <div class="p-6 space-y-6 animate-fadeIn">
-                    <!-- User Header -->
+                    <!-- User Header & Edge-case toggle -->
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-indigo-500 flex items-center justify-center font-bold text-slate-950">IT</div>
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-indigo-500 flex items-center justify-center font-bold text-slate-950 text-sm">IT</div>
                             <div>
                                 <h2 class="font-bold text-sm text-white">Ishaan Thusoo</h2>
-                                <p class="text-xs text-slate-400">GBPUAT • CSE Student</p>
+                                <p class="text-[11px] text-slate-400">${appState.selectedTrack}</p>
                             </div>
                         </div>
-                        <button onclick="toggleStreakState()" class="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-1 rounded-md hover:text-white">
-                            Toggle State (${appState.streakState})
+                        <button onclick="toggleStreakState()" class="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-2 py-1 rounded hover:text-white">
+                            State: ${appState.streakState} 🔄
                         </button>
                     </div>
 
-                    ${streakDisplay}
+                    ${streakBanner}
 
-                    <!-- Core Metrics Grid -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl relative overflow-hidden">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-cyan-400">Current Streak</span>
-                            <div class="text-3xl font-extrabold text-white mt-1">${appState.streakState === 'zero' ? '0' : '11'} <span class="text-sm font-normal text-slate-400">Days 🔥</span></div>
-                            <div class="text-[10px] text-slate-500 mt-1">Personal Best: 11 Days</div>
+                    <!-- Core Metrics & Synergy Points -->
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-cyan-400">Streak</span>
+                            <div class="text-xl font-extrabold text-white mt-0.5">${appState.streakState === 'zero' ? '0' : '11'} <span class="text-xs text-slate-400">🔥</span></div>
                         </div>
-                        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400">Overall Progress</span>
-                            <div class="text-3xl font-extrabold text-white mt-1">18.3%</div>
-                            <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                                <div class="bg-indigo-500 h-full w-[18.3%]"></div>
-                            </div>
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-indigo-400">Progress</span>
+                            <div class="text-xl font-extrabold text-white mt-0.5">18.3%</div>
+                        </div>
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-emerald-400">Synergy</span>
+                            <div class="text-xl font-extrabold text-emerald-400 mt-0.5">${appState.synergyPoints}</div>
                         </div>
                     </div>
 
-                    <!-- Today's Active Challenge Card -->
-                    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-500/30 p-5 rounded-2xl shadow-xl space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Today's Task • Day 12</span>
-                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-semibold">Active</span>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-base text-white">AI Interview Screening Agent</h3>
-                            <p class="text-xs text-slate-400 mt-1 line-clamp-2">Build a functional LLM-backed candidate screening module with structured output parsing.</p>
-                        </div>
-                        <button onclick="router.navigateTo('/day/12')" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
-                            <span>Open Today's Challenge</span>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
+                    <!-- Dashboard Tab Switcher -->
+                    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                        <button onclick="setDashboardTab('tasks')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${appState.activeTab === 'tasks' ? 'bg-cyan-500 text-slate-950' : 'text-slate-400'}">Today's Task</button>
+                        <button onclick="setDashboardTab('leaderboard')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${appState.activeTab === 'leaderboard' ? 'bg-cyan-500 text-slate-950' : 'text-slate-400'}">Leaderboard</button>
+                        <button onclick="setDashboardTab('resources')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${appState.activeTab === 'resources' ? 'bg-cyan-500 text-slate-950' : 'text-slate-400'}">Resources</button>
                     </div>
+
+                    <!-- Tab Content -->
+                    ${renderTabContent()}
 
                     <!-- 60-Day Progress Map Preview -->
-                    <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
                         <div class="flex justify-between items-center">
                             <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">60-Day Roadmap</h4>
                             <span class="text-[10px] text-slate-500">12 / 60 Completed</span>
@@ -222,6 +231,66 @@
             `;
         }
 
+        function renderTabContent() {
+            if (appState.activeTab === 'tasks') {
+                return `
+                    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-500/30 p-5 rounded-2xl shadow-xl space-y-4 animate-fadeIn">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Day 12 Challenge</span>
+                            <span class="text-[10px] ${appState.isSubmitted ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'} border px-2 py-0.5 rounded font-semibold">
+                                ${appState.isSubmitted ? 'Completed ✓' : 'Pending Submission'}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base text-white">AI Interview Screening Agent</h3>
+                            <p class="text-xs text-slate-400 mt-1">Build an LLM-backed candidate screening module with structured output JSON parsing.</p>
+                        </div>
+                        <button onclick="router.navigateTo('/day/12')" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                            <span>Open Submission Portal</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                `;
+            } else if (appState.activeTab === 'leaderboard') {
+                return `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 animate-fadeIn">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase">Top Cohort Performers</h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <span class="font-semibold text-white">1. Priyanshu Sharma</span>
+                                <span class="text-cyan-400 font-bold">12 Days 🔥 (1250 SP)</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <span class="font-semibold text-white">2. Ananya Verma</span>
+                                <span class="text-cyan-400 font-bold">12 Days 🔥 (1190 SP)</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-cyan-500/10 p-2.5 rounded-lg border border-cyan-500/30">
+                                <span class="font-semibold text-cyan-300">12. Ishaan Thusoo (You)</span>
+                                <span class="text-cyan-400 font-bold">11 Days 🔥 (${appState.synergyPoints} SP)</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3 animate-fadeIn">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase">Dorm & Peer Resources</h4>
+                        <div class="space-y-2 text-xs">
+                            <a href="https://www.youtube.com/live/Tl7kFB_DXYc" target="_blank" class="block bg-slate-950 p-3 rounded-lg border border-slate-800 hover:border-cyan-500 transition">
+                                <div class="font-bold text-cyan-400">📺 ViCodathon Kickoff Recording</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Winning strategies, tips & mistakes to avoid.</div>
+                            </a>
+                            <a href="https://abtalks.in" target="_blank" class="block bg-slate-950 p-3 rounded-lg border border-slate-800 hover:border-cyan-500 transition">
+                                <div class="font-bold text-indigo-400">🔗 Official ABTalks Portal</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Access global challenges and recruiter networks.</div>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 3. CHALLENGE DAY VIEW (/day/12)
         function renderDayChallenge() {
             return `
                 <div class="p-6 space-y-6 animate-fadeIn">
@@ -243,7 +312,7 @@
                     </div>
 
                     <!-- Acceptance Criteria -->
-                    <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-2.5">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2.5">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Acceptance Criteria</h3>
                         <ul class="space-y-2 text-xs text-slate-400">
                             <li class="flex items-center gap-2">
@@ -263,8 +332,9 @@
 
                     <!-- Proof of Work Submission Form -->
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-white flex items-center justify-between">
                             <span>🚀 Submit Proof of Work</span>
+                            ${appState.isSubmitted ? '<span class="text-xs text-emerald-400 font-normal">Submitted Successfully ✓</span>' : ''}
                         </h3>
 
                         <div class="space-y-3">
@@ -279,7 +349,7 @@
                         </div>
 
                         <button onclick="handleSubmission()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
-                            <span>Verify & Submit Proof</span>
+                            <span>Verify & Submit Proof (+50 Synergy Points)</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                         </button>
                     </div>
@@ -298,12 +368,23 @@
             return html;
         }
 
+        function setTrack(track) {
+            appState.selectedTrack = track;
+            render();
+            showToast(`Track set to: ${track}`);
+        }
+
+        function setDashboardTab(tab) {
+            appState.activeTab = tab;
+            render();
+        }
+
         function toggleStreakState() {
             if (appState.streakState === 'active') appState.streakState = 'zero';
             else if (appState.streakState === 'zero') appState.streakState = 'missed';
             else appState.streakState = 'active';
             render();
-            showToast(`Switched edge-case state to: ${appState.streakState}`);
+            showToast(`Edge-case state: ${appState.streakState}`);
         }
 
         function handleSubmission() {
@@ -313,9 +394,10 @@
                 showToast('Please provide both GitHub and LinkedIn URLs.');
                 return;
             }
-            appState.dayCompleted = true;
+            appState.isSubmitted = true;
             appState.streakState = 'active';
-            showToast('🎉 Submission verified! Streak updated successfully.');
+            appState.synergyPoints += 50;
+            showToast('🎉 Verified! +50 Synergy Points added.');
             setTimeout(() => router.navigateTo('/dashboard'), 1500);
         }
 
@@ -344,7 +426,6 @@
             else if (route === '/day/12') html = renderDayChallenge();
             else html = renderLanding();
 
-            // Append Toast if active
             if (appState.toastMessage) {
                 html += `
                     <div class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 border border-cyan-500/50 text-cyan-300 text-xs px-4 py-2.5 rounded-xl shadow-2xl z-50 animate-bounce">
@@ -356,7 +437,6 @@
             container.innerHTML = html;
         }
 
-        // Initialize Router on Load
         window.addEventListener('DOMContentLoaded', () => {
             if (!window.location.hash) window.location.hash = '/';
             router.init();
