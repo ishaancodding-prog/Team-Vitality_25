@@ -46,7 +46,7 @@
         }
     </style>
 </head>
-<body class="bg-[#030712] text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-slate-950">
+<body class="bg-[#030712] text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950 min-h-screen flex flex-col justify-between">
 
     <!-- Premium Animated Background Gradients -->
     <div class="fixed top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none animate-pulse-slow"></div>
@@ -72,7 +72,11 @@
             <button onclick="router.navigateTo('/contact')" id="nav-contact" class="px-4 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white">📬 Contact</button>
         </nav>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-4">
+            <!-- Live Clock Widget -->
+            <div id="liveClock" class="hidden sm:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl font-mono text-xs text-cyan-300 font-bold tracking-wider shadow-inner">
+                <span>🕒</span> <span id="clockText">00:00:00</span>
+            </div>
             <span class="hidden sm:inline-flex text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3.5 py-1.5 rounded-full font-bold items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> India 2026
             </span>
@@ -121,6 +125,17 @@
             setTimeout(() => { appState.toastMessage = null; render(); }, 3500);
         }
 
+        // Live Clock Script
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const clockEl = document.getElementById('clockText');
+            if (clockEl) {
+                clockEl.innerText = timeString;
+            }
+        }
+        setInterval(updateClock, 1000);
+
         const router = {
             currentRoute: '/',
             init() { 
@@ -152,11 +167,11 @@
                         <div class="inline-flex items-center gap-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-inner">
                             <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span> Made by Team : Vitality • Day 1 Kickoff
                         </div>
-                         
+                        
                         <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] max-w-5xl mx-auto">
                             Code Without Limits.<br>Own Your <span class="text-gradient">60-Day Public Streak.</span>
                         </h1>
-                         
+                        
                         <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto font-medium">
                             Transform post-college hours into high-impact applications. Commit code daily, build production-ready projects, and showcase your proof of work to top recruiters.
                         </p>
@@ -237,26 +252,29 @@
             `;
         }
 
-        // 2. DASHBOARD VIEW WITH 60-DAY INTERACTIVE CALENDAR
+        // 2. DASHBOARD VIEW WITH REFINED, AESTHETICALLY HARMONIZED CALENDAR GRID
         function renderDashboard() {
             let daysHtml = '';
             for (let i = 1; i <= 60; i++) {
                 const isSelected = appState.selectedCalendarDay === i;
                 const isUnlocked = i === 1; // Day 1 is unlocked initially
                 
-                let btnClasses = "p-3 rounded-xl text-xs font-extrabold transition flex flex-col items-center justify-center gap-1 border ";
+                let btnClasses = "group relative p-3.5 rounded-2xl text-xs font-bold transition-all duration-300 flex flex-col items-center justify-center gap-1 border backdrop-blur-md ";
                 if (isSelected) {
-                    btnClasses += "bg-cyan-500 text-slate-950 border-cyan-400 shadow-lg shadow-cyan-500/30 scale-105 z-10";
+                    // Aesthetic glowing violet-to-indigo gradient for selected active state
+                    btnClasses += "bg-gradient-to-br from-violet-500 via-indigo-500 to-purple-600 text-white border-violet-400 shadow-xl shadow-indigo-500/30 scale-105 z-10 font-extrabold ring-2 ring-violet-400/50";
                 } else if (isUnlocked) {
-                    btnClasses += "bg-slate-900/90 text-cyan-400 border-cyan-500/30 hover:border-cyan-400 hover:bg-slate-800";
+                    // Sleek, clean slate-800 look with soft indigo/violet tint for unlocked states
+                    btnClasses += "bg-slate-900/80 text-violet-300 border-violet-500/25 hover:border-violet-400 hover:bg-slate-800 hover:shadow-lg hover:shadow-indigo-500/10";
                 } else {
-                    btnClasses += "bg-slate-950/40 text-slate-600 border-slate-900/80 cursor-not-allowed";
+                    // Muted, refined dark tone for locked days
+                    btnClasses += "bg-slate-950/40 text-slate-500 border-slate-900/80 opacity-50 cursor-not-allowed";
                 }
 
                 daysHtml += `
                     <button onclick="${isUnlocked ? `selectCalendarDay(${i})` : `showToast('🔒 Day ${i} unlocks after completing prior days!')`}" class="${btnClasses}">
-                        <span>Day ${i}</span>
-                        <span class="text-[9px] ${isSelected ? 'text-slate-900 font-bold' : (isUnlocked ? 'text-emerald-400' : 'text-slate-600')}">${i === 1 ? '✓ Done' : 'Locked'}</span>
+                        <span class="tracking-wide">Day ${i}</span>
+                        <span class="text-[10px] font-medium ${isSelected ? 'text-violet-100' : (isUnlocked ? 'text-emerald-400' : 'text-slate-600')}">${i === 1 ? '✓ Done' : 'Locked'}</span>
                     </button>
                 `;
             }
@@ -266,15 +284,15 @@
                 selectedDayContent = `
                     <div class="space-y-4 animate-fadeIn">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-extrabold text-cyan-400 uppercase tracking-widest">Day 1 Details • Completed Work</span>
-                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3.5 py-1 rounded-full font-bold">Verified ✓</span>
+                            <span class="text-xs font-extrabold text-violet-400 uppercase tracking-widest bg-violet-500/10 px-3.5 py-1 rounded-full border border-violet-500/20">Day 1 Details • Completed Work</span>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-3.5 py-1 rounded-full font-bold shadow-sm">Verified ✓</span>
                         </div>
                         <h4 class="text-xl font-extrabold text-white">Environment Setup & Hello World</h4>
-                        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed font-medium">
                             Initialized public GitHub repository, configured development environment, established Team Vitality layout structure, and published the initial core framework.
                         </p>
                         <div class="pt-2 flex gap-3">
-                            <button onclick="router.navigateTo('/day/1')" class="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 font-bold px-4 py-2 rounded-xl text-xs transition">
+                            <button onclick="router.navigateTo('/day/1')" class="bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm">
                                 View Day 1 Submission Form →
                             </button>
                         </div>
@@ -282,17 +300,17 @@
                 `;
             } else {
                 selectedDayContent = `
-                    <div class="space-y-4 animate-fadeIn text-center py-8">
+                    <div class="space-y-3 animate-fadeIn text-center py-8">
                         <span class="text-3xl">🔒</span>
                         <h4 class="text-lg font-extrabold text-white">Day ${appState.selectedCalendarDay} Preview</h4>
-                        <p class="text-slate-400 text-xs max-w-md mx-auto">This milestone unlocks progressively as you advance through your 60-day public coding challenge streak.</p>
+                        <p class="text-slate-400 text-xs max-w-md mx-auto font-medium">This milestone unlocks progressively as you advance through your 60-day public coding challenge streak.</p>
                     </div>
                 `;
             }
 
             return `
                 <div class="space-y-8 animate-fadeIn max-w-5xl mx-auto">
-                    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-6 rounded-[2rem] flex items-center gap-5 backdrop-blur-xl">
+                    <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-6 rounded-[2rem] flex items-center gap-5 backdrop-blur-xl shadow-lg">
                         <span class="text-4xl">🌱</span>
                         <div>
                             <h4 class="text-sm font-extrabold text-amber-400 uppercase tracking-wide">Day 1 - Active Streak Started</h4>
@@ -330,28 +348,28 @@
             if (appState.dashboardTab === 'tasks') {
                 return `
                     <div class="space-y-6">
-                        <div class="glass-panel p-8 rounded-[2.5rem] space-y-6">
+                        <div class="glass-panel p-8 rounded-[2.5rem] space-y-6 shadow-xl">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                 <div>
-                                    <h3 class="text-xl font-extrabold text-white">60-Day Challenge Calendar</h3>
-                                    <p class="text-xs text-slate-400">Click any unlocked day below to inspect completed work and logs.</p>
+                                    <h3 class="text-xl font-extrabold text-white tracking-tight">60-Day Challenge Calendar</h3>
+                                    <p class="text-xs text-slate-400 font-medium">Click any unlocked day below to inspect completed work and logs.</p>
                                 </div>
-                                <span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3.5 py-1.5 rounded-full font-bold">Selected: Day ${appState.selectedCalendarDay}</span>
+                                <span class="text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20 px-3.5 py-1.5 rounded-full font-bold">Selected: Day ${appState.selectedCalendarDay}</span>
                             </div>
 
-                            <div class="grid grid-cols-5 sm:grid-cols-10 gap-2.5 max-h-72 overflow-y-auto pr-2">
+                            <div class="grid grid-cols-5 sm:grid-cols-10 gap-3 max-h-80 overflow-y-auto pr-2">
                                 ${daysHtml}
                             </div>
                         </div>
 
-                        <div class="glass-panel p-8 rounded-[2.5rem] border border-cyan-500/30">
+                        <div class="glass-panel p-8 rounded-[2.5rem] border border-violet-500/20 shadow-xl">
                             ${selectedDayContent}
                         </div>
                     </div>
                 `;
             } else if (appState.dashboardTab === 'leaderboard') {
                 return `
-                    <div class="glass-panel p-8 rounded-[2.5rem] space-y-6">
+                    <div class="glass-panel p-8 rounded-[2.5rem] space-y-6 shadow-xl">
                         <h4 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider">Top Cohort Performers</h4>
                         <div class="space-y-3.5">
                             <div class="flex justify-between items-center bg-slate-900/90 p-4.5 rounded-2xl border border-slate-800">
@@ -367,11 +385,11 @@
                 `;
             } else {
                 return `
-                    <div class="glass-panel p-8 lg:p-10 rounded-[2.5rem] space-y-6 animate-fadeIn">
+                    <div class="glass-panel p-8 lg:p-10 rounded-[2.5rem] space-y-6 animate-fadeIn shadow-xl">
                         <div class="space-y-2">
                             <span class="text-xs font-extrabold text-cyan-400 uppercase tracking-widest">Support Portal</span>
                             <h3 class="text-2xl font-extrabold text-white">Dashboard Contact Us</h3>
-                            <p class="text-slate-400 text-sm">Need help with your Day 1 streak or submissions? Reach out directly to Team Vitality.</p>
+                            <p class="text-slate-400 text-sm font-medium">Need help with your Day 1 streak or submissions? Reach out directly to Team Vitality.</p>
                         </div>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -436,7 +454,7 @@
                                 <label class="block text-xs font-bold uppercase text-slate-400 mb-2">LinkedIn Post URL</label>
                                 <input type="text" id="liInput" value="${appState.linkedinLink}" oninput="appState.linkedinLink=this.value" placeholder="https://linkedin.com/posts/..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-400">
                             </div>
-                             
+                            
                             <div class="bg-slate-950/90 border border-slate-800 p-5 rounded-2xl space-y-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs uppercase font-extrabold text-slate-300">Security Math Verification</span>
@@ -599,6 +617,7 @@
                     }
                 }
             });
+            updateClock();
         }
 
         window.addEventListener('DOMContentLoaded', () => { router.init(); });
